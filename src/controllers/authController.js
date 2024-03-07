@@ -5,6 +5,7 @@ const User = require('../models/userModel.js');
 
 //utils
 const handleValidation = require('../utils/handleValidation.js');
+const { generateToken } = require('../utils/handleJWT.js');
 
 // @desc     User Signup 
 // route     POST /api/auth/signup
@@ -30,7 +31,11 @@ const signup = async(req, res, next) => {
             email,
             password: hashedPassword
         });
-        
+
+        const token = generateToken({
+            email: user.email
+        });
+
         if (user) {
             return res.status(201).json({
                 ok: true,
@@ -38,7 +43,8 @@ const signup = async(req, res, next) => {
                 data: {
                     user: {
                         username: user.username,
-                        email: user.email
+                        email: user.email,
+                        token: token
                     }
                 }
             }); 
@@ -97,6 +103,10 @@ const login = async(req, res, next) => {
                 data: {}
             }); 
         }; 
+
+        const token = generateToken({
+            email: user.email
+        });
         
         return res.status(200).json({
             ok: true,
@@ -104,7 +114,8 @@ const login = async(req, res, next) => {
             data: {
                 user: {
                     username: user.username,
-                    email: user.email
+                    email: user.email,
+                    token: token
                 }
             }
         }); 

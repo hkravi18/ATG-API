@@ -1,4 +1,4 @@
-const handleValidation = async(username, email, password, act) => {
+const handleValidation = (username, email, password, act) => {
     if ((!username || !password) || (act === "signup" && !email)) {
         return {
             valid: false,

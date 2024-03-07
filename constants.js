@@ -1,4 +1,4 @@
-const DB_NAME = "atg/project";
+const DB_NAME = "ATG";
 
 module.exports = {
     DB_NAME 

@@ -10,6 +10,12 @@ const port = process.env.PORT || 4000;
 //importing routes
 const authRoutes = require('./src/routes/authRoutes.js');
 
+//middlewares 
+const logger = require('./src/middleware/loggerMiddleware.js');
+
+//logger middleware
+app.use(logger);
+
 //routes
 app.use('/api/auth', authRoutes);
 
@@ -21,7 +27,7 @@ connectDB()
     });
 
     app.listen(port, () => {
-        console.log(`Server listening on ${port}`);
+        console.log(`Server listening on ${port}\n`);
     }) 
 })
 .catch((err) => {
