@@ -13,10 +13,11 @@ const signup = async(req, res, next) => {
     try {
         const { username, email, password } = req.body;
         
-        if (!handleValidation(username, email, password, "signup")) {
+        const validationRes = await handleValidation(username, email, password, "signup");
+        if (!validationRes.valid) {
             return res.status(400).json({
                 ok: false,
-                error: "Invalid input fields value, Please enter a valid values",
+                error: validationRes.error,
                 data: {}
             }); 
         }
@@ -59,11 +60,65 @@ const signup = async(req, res, next) => {
     }
 };
 
+// @desc     User Login 
+// route     POST /api/auth/login
+// @access   Public
 const login = async(req, res, next) => {
-      
+    try {
+        const { username, password } = req.body;
+
+        const validationRes = handleValidation(username, "", password, "login");
+        if (!validationRes.valid) {
+            return res.status(400).json({
+                ok: false,
+                error: validationRes.error,
+                data: {}
+            }); 
+        }
+
+        const user = await User.findOne({
+            username
+        });
+
+        if (!user) {
+            return res.status(404).json({
+                ok: false,
+                error: "Incorrect email or password",
+                data: {}
+            }); 
+        } 
+
+        const checkPassword = await bcrypt.compare(password, user.password);
+        
+        if (!checkPassword) {
+            return res.status(401).json({
+                ok: false,
+                error: "Incorrect email or password",
+                data: {}
+            }); 
+        }; 
+        
+        return res.status(200).json({
+            ok: true,
+            message: "User logged in successfully.",
+            data: {
+                user: {
+                    username: user.username,
+                    email: user.email
+                }
+            }
+        }); 
+    } catch (err) {
+        console.error(`ERROR (login): ${err.message}`);
+        
+        return res.status(500).json({
+            ok: false,
+            error: "User Logged In failed. Please try again.",
+            data: {}
+        });
+    } 
 };
 
-
-modules.exports = {
+module.exports = {
     signup, login
 };
