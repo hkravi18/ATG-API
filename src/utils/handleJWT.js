@@ -10,7 +10,7 @@ const generateToken = (payload) => {
 const verifyToken = async() => {
     try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
-        return decoded.id; 
+        return decoded; 
     } catch (err) {
         console.error(`ERROR (token_verify) : ${err.message}`);
         return null;

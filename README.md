@@ -67,9 +67,11 @@ FOR EXAMPLE:
 
 ```.env
 PORT=4000
-MONGO_URI=<MONGODB_URI> (for example: `mongodb://127.0.0.1:27017/atg/api` (local setup))
+MONGO_URI=<MONGODB_URI> (for example: `mongodb://127.0.0.1:27017/atg/api` (local setup))  
+SECRET_KEY=any_secret_key
 ```
 
+**Start Mongodb Daemon To use local mongodb database**
 
 ## Usage 
 Signup is done with username (unique), email id and password  
