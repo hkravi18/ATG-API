@@ -1,13 +1,29 @@
+require('dotenv').config();
 const app = require('./app.js');
 
-const port = 3000;
+//db connection
+const connectDB = require('./src/db/connectDB.js');
 
+//port 
+const port = process.env.PORT || 4000;
 
-//routes
+//importing routes
 const authRoutes = require('./src/routes/authRoutes.js');
 
+//routes
 app.use('/api/auth', authRoutes);
 
-app.listen(3000, () => {
-    console.log(`Server listening on port ${port}`);
+//database connection
+connectDB()
+.then(() => {
+    app.on('error', (err) => {
+        console.log("App error: " + err?.message);
+    });
+
+    app.listen(port, () => {
+        console.log(`Server listening on ${port}`);
+    }) 
 })
+.catch((err) => {
+    console.log("MONGODB connection failed: ", err); 
+});
