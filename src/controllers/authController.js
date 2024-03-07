@@ -10,19 +10,19 @@ const { generateToken } = require('../utils/handleJWT.js');
 // @desc     User Signup 
 // route     POST /api/auth/signup
 // @access   Public
-const signup = async(req, res, next) => {
+const signup = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
-        
+
         const validationRes = await handleValidation(username, email, password, "signup");
         if (!validationRes.valid) {
             return res.status(400).json({
                 ok: false,
                 error: validationRes.error,
                 data: {}
-            }); 
+            });
         }
-       
+
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -34,7 +34,7 @@ const signup = async(req, res, next) => {
 
         const token = generateToken({
             email: user.email
-        });
+        }, '2h');
 
         if (user) {
             return res.status(201).json({
@@ -47,7 +47,7 @@ const signup = async(req, res, next) => {
                         token: token
                     }
                 }
-            }); 
+            });
         } else {
             return res.status(500).json({
                 ok: false,
@@ -57,7 +57,7 @@ const signup = async(req, res, next) => {
         }
     } catch (err) {
         console.error(`ERROR (signup): ${err.message}`);
-        
+
         return res.status(500).json({
             ok: false,
             error: "User Registration failed, Please try again later.",
@@ -69,7 +69,7 @@ const signup = async(req, res, next) => {
 // @desc     User Login 
 // route     POST /api/auth/login
 // @access   Public
-const login = async(req, res, next) => {
+const login = async (req, res, next) => {
     try {
         const { username, password } = req.body;
 
@@ -79,7 +79,7 @@ const login = async(req, res, next) => {
                 ok: false,
                 error: validationRes.error,
                 data: {}
-            }); 
+            });
         }
 
         const user = await User.findOne({
@@ -91,23 +91,23 @@ const login = async(req, res, next) => {
                 ok: false,
                 error: "Incorrect email or password",
                 data: {}
-            }); 
-        } 
+            });
+        }
 
         const checkPassword = await bcrypt.compare(password, user.password);
-        
+
         if (!checkPassword) {
             return res.status(401).json({
                 ok: false,
                 error: "Incorrect email or password",
                 data: {}
-            }); 
-        }; 
+            });
+        };
 
         const token = generateToken({
             email: user.email
-        });
-        
+        }, '2h');
+
         return res.status(200).json({
             ok: true,
             message: "User logged in successfully.",
@@ -118,16 +118,16 @@ const login = async(req, res, next) => {
                     token: token
                 }
             }
-        }); 
+        });
     } catch (err) {
         console.error(`ERROR (login): ${err.message}`);
-        
+
         return res.status(500).json({
             ok: false,
             error: "User Logged In failed. Please try again.",
             data: {}
         });
-    } 
+    }
 };
 
 module.exports = {

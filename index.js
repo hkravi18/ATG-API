@@ -9,6 +9,7 @@ const port = process.env.PORT || 4000;
 
 //importing routes
 const authRoutes = require('./src/routes/authRoutes.js');
+const passwordRoutes = require('./src/routes/passwordRoutes.js');
 
 //middlewares 
 const logger = require('./src/middleware/loggerMiddleware.js');
@@ -18,6 +19,7 @@ app.use(logger);
 
 //routes
 app.use('/api/auth', authRoutes);
+app.use('/api/password', passwordRoutes);
 
 //database connection
 connectDB()
