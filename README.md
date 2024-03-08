@@ -21,6 +21,7 @@ This is a simple project based on MERN tech stack for basic user authentication 
 
 - User registration and authentication 
 - Forget Password functionality for resetting password
+- Uses JWT for authentication and pasword resetting
 
 ## Technologies Used
 
@@ -53,9 +54,9 @@ npm install
 
 In root directory:
 - To start the server using Nodemon **npm run dev**
-
 - To start the server without Nodemon **npm start** 
 
+> NOTE: Start the mongodb daemon if you are using local mongodb database. If you're using remote service, then replace the MONGO_URI in .env with the database connection string of the remote service you are using.
 
 
 ## Configuration
@@ -88,11 +89,20 @@ Login is done with username (unique)
 - **POST /api/auth/login**
   - Description: To login the user.
 
+### Password
+
+- **POST /api/password/forget**
+  - Description: To generate token for password resetting.
+
+- **POST /api/password/reset**
+  - Description: To reset the password after verifying the token.
+
 
 ## Backend 
 Router are created for authentication.  
 Controllers are created for handling routes of these routers.  
-Bcrypt is used to encrypt the passwords before saving to the database.
+Bcrypt is used to encrypt the passwords before saving to the database.  
+JWT is used to authenticate the user
 
 
 ## Database

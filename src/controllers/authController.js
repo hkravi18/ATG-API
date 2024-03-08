@@ -14,7 +14,7 @@ const signup = async (req, res, next) => {
     try {
         const { username, email, password } = req.body;
 
-        const validationRes = await handleValidation(username, email, password, "signup");
+        const validationRes = handleValidation(username, email, password, "signup");
         if (!validationRes.valid) {
             return res.status(400).json({
                 ok: false,
@@ -23,6 +23,7 @@ const signup = async (req, res, next) => {
             });
         }
 
+        //hashing the password
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 

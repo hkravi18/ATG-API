@@ -7,7 +7,7 @@ const generateToken = (payload, expiry) => {
     return jwt.sign(payload, secret, options);
 };
 
-const verifyToken = async() => {
+const verifyToken = async(token) => {
     try {
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
         return decoded; 

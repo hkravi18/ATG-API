@@ -1,5 +1,10 @@
+const bcrypt = require('bcrypt');
+
+//models
 const User = require('../models/userModel.js');
-const { generateToken } = require('../utils/handleJWT.js');
+
+//utils
+const { verifyToken, generateToken } = require('../utils/handleJWT.js');
 
 // @desc     Forget Password 
 // route     POST /api/password/forget
@@ -25,6 +30,7 @@ const forgetPassword = async (req, res, next) => {
 
     const tokenExpiry = new Date();
 
+    //setting up user variables for token expiration and authentication
     user.resetPasswordToken = token;
     user.resetPasswordExpires = tokenExpiry;
     await user.save();
@@ -34,7 +40,9 @@ const forgetPassword = async (req, res, next) => {
     return res.status(200).json({
       ok: true,
       message: "If the email is registered, a password reset link will be sent.",
-      data: {}
+      data: {
+        token
+      }
     });
   } catch (err) {
     console.error(`ERROR (forget-password): ${err.message}`);
@@ -54,19 +62,22 @@ const resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
+    //finding any document which has matching token and has expiry greater than current time 
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() }
     });
 
+    //token expired or token is tampered
     if (!user) {
-      return res.status(200).json({
+      return res.status(403).json({
         ok: true,
         message: "Password reset token is invalid or has expired.",
         data: {}
       });
     }
 
+    //hasing the new password
     user.password = await bcrypt.hash(newPassword, 10);
 
     //clearning the reset fields from user in the database 
