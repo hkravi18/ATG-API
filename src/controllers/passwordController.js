@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt');
 const User = require('../models/userModel.js');
 
 //utils
-const { verifyToken, generateToken } = require('../utils/handleJWT.js');
+const { generateToken } = require('../utils/handleJWT.js');
+const sendMail = require('../utils/sendMail.js');
 
 // @desc     Forget Password 
 // route     POST /api/password/forget
@@ -35,15 +36,30 @@ const forgetPassword = async (req, res, next) => {
     user.resetPasswordExpires = tokenExpiry;
     await user.save();
 
-    // TODO: Send token to the user's email 
-
-    return res.status(200).json({
-      ok: true,
-      message: "If the email is registered, a password reset link will be sent.",
-      data: {
-        token
-      }
+    const mailInfo = sendMail({
+      from: process.env.USER_EMAIL,
+      to: user.email,
+      subject: "(Basic-API) Password reset Link",
+      text: '',
+      html: `TOKEN FOR PASSWORD RESETTING : <strong>${token}<strong>`
     });
+
+    if (mailInfo) {
+      console.log("Mail send to the user email.");
+      return res.status(200).json({
+        ok: true,
+        message: "If the email is registered, a password reset link will be sent.",
+        data: {}
+      });
+    } else {
+      console.error(`ERROR (forget-password): ${err.message}`);
+      return res.status(500).json({
+        ok: false,
+        error: "Forget Password failed, Please try again later.",
+        data: {}
+      });
+    }
+
   } catch (err) {
     console.error(`ERROR (forget-password): ${err.message}`);
     return res.status(500).json({
@@ -83,7 +99,7 @@ const resetPassword = async (req, res) => {
     //clearning the reset fields from user in the database 
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
-    
+
     await user.save();
 
     return res.status(200).json({

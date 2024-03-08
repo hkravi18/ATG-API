@@ -21,7 +21,8 @@ This is a simple project based on MERN tech stack for basic user authentication 
 
 - User registration and authentication 
 - Forget Password functionality for resetting password
-- Uses JWT for authentication and pasword resetting
+- Uses JWT for authentication and password resetting
+- Email is send to given email address on forget password
 
 ## Technologies Used
 
@@ -68,11 +69,22 @@ FOR EXAMPLE:
 
 ```.env
 PORT=4000
-MONGO_URI=<MONGODB_URI> (for example: `mongodb://localhost:27017` (local setup))  
+MONGO_URI=<MONGODB_URI>  
 SECRET_KEY=any_secret_key
+
+# Email environment variables   
+USER_EMAIL=  
+USER_PASSWORD=  
 ```
+**If you are using local mongodb MONGO_URI=`mongodb://localhost:27017`**
 
 **Start Mongodb Daemon To use local mongodb database**
+
+**USER_EMAIL** is the email address which will send the email to those users who wants to reset password  
+
+**USER_PASSWORD** is the app password for the associated email address
+
+>IMP NOTE: The **USER_EMAIL** should be allowed to send email (App passwords should be allowed in the coresspoding google account setting, as Google has changed some setting regarding the App password)
 
 ## Usage 
 Signup is done with username (unique), email id and password  
@@ -92,17 +104,18 @@ Login is done with username (unique)
 ### Password
 
 - **POST /api/password/forget**
-  - Description: To generate token for password resetting.
+  - Description: To generate token for password resetting and sending the mail.
 
 - **POST /api/password/reset**
   - Description: To reset the password after verifying the token.
 
 
 ## Backend 
-Router are created for authentication.  
-Controllers are created for handling routes of these routers.  
-Bcrypt is used to encrypt the passwords before saving to the database.  
-JWT is used to authenticate the user
+- Router are created for authentication.  
+- Controllers are created for handling routes of these routers.  
+- Bcrypt is used to encrypt the passwords before saving to the database.  
+- JWT is used to authenticate the user  
+- Nodemailer is used to send a resetting password email (currently restricted to google email accounts only).
 
 
 ## Database
