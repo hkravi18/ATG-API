@@ -13,6 +13,7 @@ This is a simple project based on MERN tech stack for basic user authentication 
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [API Routes](#api-routes)
+- [API Response](#api-response)
 - [Backend](#backend)
 - [Database](#database)
 
@@ -96,19 +97,89 @@ Login is done with username (unique)
 ### Auth
 
 - **POST /api/auth/signup**
+  - Content-Type: _application/json_
   - Description: To Signup the user.
 
 - **POST /api/auth/login**
+  - Content-Type: _application/json_
   - Description: To login the user.
+
+  
 
 ### Password
 
 - **POST /api/password/forget**
+  - Content-Type: _application/json_
   - Description: To generate token for password resetting and sending the mail.
 
 - **POST /api/password/reset**
+  - Content-Type: _application/json_
   - Description: To reset the password after verifying the token.
 
+## API Response
+
+### Signup/Login
+On successful signup/login, the server will respond with a 200 status code and a JSON object containing the user's information.
+  ```javascript 
+  {
+    ok: true,
+    message: "success_message",
+    data: {
+        user: {
+            username: "username",
+            email: "email",
+            toke: "token"
+        }
+    }
+  }
+  ```
+  
+  If the login is unsuccessful, the server will respond with a 400 Bad Request status code and a JSON object containing an error message. 
+  ```javascript 
+  {
+    ok: false,
+    error: "error_message",
+    data: {}
+  }
+  ```
+
+  ### Forget Password
+  On succesfully sending a password reset token to the user's email address, the server will respond with 200 status code. 
+  ```javascript 
+  {
+    ok: true,
+    message: "If the email is registered, a password reset link will be sent.",
+    data: {}
+  }
+  ```
+  
+  If the forget request is unsuccessful from server end, the server will respond with a 500 status code and a JSON object containing an error message. 
+  ```javascript 
+  {
+    ok: false,
+    error: "error_message",
+    data: {}
+  }
+  ```
+
+  ### Reset Password
+  On succesfully resetting the password, the server will respond with 200 status code. 
+  ```javascript 
+  {
+    ok: true,
+    message: "Password has been changed successfully.",
+    data: {}
+  }
+  ```
+  
+  If the password resetting is unsuccessful, the server will respond with a 403 forbidden status code and a JSON object containing an error message. 
+  ```javascript 
+  {
+    ok: false,
+    error: "Password reset token is invalid or has expired.",
+    data: {}
+  }
+  ```
 
 ## Backend 
 - Router are created for authentication.  

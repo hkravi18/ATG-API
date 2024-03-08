@@ -23,6 +23,15 @@ const signup = async (req, res, next) => {
             });
         }
 
+        const userAlreadyExists = await User.findOne({ email });
+        if (userAlreadyExists) {
+            return res.status(500).json({
+                ok: false,
+                error: "User already exists. Please Login",
+                data: {}
+            })
+        }
+
         //hashing the password
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
