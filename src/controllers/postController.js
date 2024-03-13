@@ -1,0 +1,222 @@
+//models
+const Post = require('../models/postModel.js');
+const Comment = require('../models/commentModel.js');
+ 
+// @desc     Get All Posts 
+// route     GET /api/posts
+// @access   Public
+const getAllPosts = async() => {
+    try {
+        const postsList = await Post.findOne({});
+        console.log("posts : ", postsList);
+
+        return res.status(200).json({
+            ok: true, 
+            message: "Posts fetched successfully",
+            data: {
+                posts: postsList
+            }
+        });
+    } catch (err) {
+        console.error(`ERROR (get-all-posts): ${err.message}`);
+
+        return res.status(500).json({
+            ok: false,
+            error: "Posts fetching failed, Please try again later.",
+            data: {}
+        })
+    }
+};
+
+// @desc     Get Single Posts 
+// route     GET /api/posts/:id
+// @access   Public
+const getPost = async() => {
+    try {
+        const { id } = req.params;
+        
+        if (!id) {
+            console.log("ERROR (get-single-post): id is required");
+            return res.status(404).json({
+                ok: false,
+                data: {},
+                error: "Post id is required",
+            }); 
+        }
+        
+        const post = await Post.findById(id);
+        console.log("Fetched Post : ", post);
+
+        if (!post) {
+            console.log("ERROR (get-single-post): post does not exists");
+            return res.status(404).json({
+                ok: false,
+                data: {},
+                error: "Post with given id does not exist",
+            }); 
+        }
+
+        return res.status(200).json({
+            ok: true, 
+            message: "Post fetched successfully",
+            data: {
+                posts: post
+            }
+        });
+    } catch (err) {
+        console.error(`ERROR (get-single-post): ${err.message}`);
+
+        return res.status(500).json({
+            ok: false,
+            error: "Post fetching failed, Please try again later.",
+            data: {}
+        })
+    }
+};
+
+
+// @desc     Create Post 
+// route     POST /api/posts
+// @access   Private
+const createPost = async() => {
+    try {
+        const { email } = req.user; 
+        const { content } = req.body;
+
+        if (!content) {
+            console.log("ERROR (update-post): post content is required");
+            return res.status(404).json({
+                ok: false,
+                data: {},
+                error: "Post content is required",
+            }); 
+        }
+ 
+        const createdPost = await Post.create({
+            createdBy: email,
+            content,
+            likes: [],
+        });
+
+        console.log("created post : ", createdPost);
+
+        return res.status(200).json({
+            ok: true, 
+            message: "Post created successfully",
+            data: {
+                posts: createdPost
+            }
+        });
+    } catch (err) {
+        console.error(`ERROR (create-post): ${err.message}`);
+
+        return res.status(500).json({
+            ok: false,
+            error: "Post creating failed, Please try again later.",
+            data: {}
+        })
+    }
+};
+
+
+// @desc     Update Post 
+// route     PUT /api/posts
+// @access   Private
+const updatePost = async() => {
+    try {
+        const { email } = req.user; 
+        const { id, content } = req.body;
+
+        if (!id) {
+            console.log("ERROR (update-post): id is required");
+            return res.status(404).json({
+                ok: false,
+                data: {},
+                error: "Post id is required",
+            }); 
+        }
+ 
+        const post = await Post.findById(id);
+        
+        //user is not allowed to update this post (as the post is not created by the user)
+        if (post.createdBy !== email) {
+            console.log("ERROR (update-post): User not authorized to update this post");
+            return res.status(404).json({
+                ok: false,
+                data: {},
+                error: "User not authorized to update this post",
+            }); 
+        }
+
+        //updating the post
+        post.content = content; 
+        post.save();
+
+        console.log("updated post : ", post);
+
+        return res.status(200).json({
+            ok: true, 
+            message: "Post updated successfully",
+            data: {
+                posts: post
+            }
+        });
+    } catch (err) {
+        console.error(`ERROR (update-post): ${err.message}`);
+
+        return res.status(500).json({
+            ok: false,
+            error: "Post updating failed, Please try again later.",
+            data: {}
+        })
+    }
+};
+
+// @desc     Delete Post 
+// route     DELETE /api/posts/:id
+// @access   Private
+const deletePost = async() => {
+    try {
+        const { id } = req.params;
+        
+        const deletedPost = await Post.findByIdAndDelete(id);
+        console.log("deletedPosts : ", deletedPost);
+        
+        if (!deletedPost) {
+            console.log("ERROR (delete-post): post does not exists");
+            return res.status(404).json({
+                ok: false,
+                data: {},
+                error: "Post with given id does not exist",
+            }); 
+        }
+
+        //deleting all the comments for this post
+        await Comment.deleteMany({ post: id });
+
+        return res.status(200).json({
+            ok: true, 
+            message: "Post deleted successfully",
+            data: {
+                posts: deletePost
+            }
+        });
+    } catch (err) {
+        console.error(`ERROR (delete-posts): ${err.message}`);
+
+        return res.status(500).json({
+            ok: false,
+            error: "Posts deleting failed, Please try again later.",
+            data: {}
+        })
+    }
+};
+
+
+module.exports = {
+    getPost,
+    getAllPosts,
+    createPost,
+    updatePost,
+    deletePost
+};

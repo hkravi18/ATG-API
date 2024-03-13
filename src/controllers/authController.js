@@ -72,7 +72,7 @@ const signup = async (req, res, next) => {
             ok: false,
             error: "User Registration failed, Please try again later.",
             data: {}
-        })
+        });
     }
 };
 
