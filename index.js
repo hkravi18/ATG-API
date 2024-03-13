@@ -11,6 +11,7 @@ const port = process.env.PORT || 4000;
 const authRoutes = require('./src/routes/authRoutes.js');
 const passwordRoutes = require('./src/routes/passwordRoutes.js');
 const postRoutes = require('./src/routes/postRoutes.js');
+const commentRoutes = require('./src/routes/commentRoutes.js');
 
 //middlewares 
 const logger = require('./src/middleware/loggerMiddleware.js');
@@ -22,6 +23,7 @@ app.use(logger);
 app.use('/api/auth', authRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/posts', postRoutes);
+app.use('/api/comments', commentRoutes);
 
 //database connection
 connectDB()

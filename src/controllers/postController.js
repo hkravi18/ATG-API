@@ -177,7 +177,31 @@ const updatePost = async() => {
 // @access   Private
 const deletePost = async() => {
     try {
+        const { email } = req.user;
         const { id } = req.params;
+
+        const post = await Post.findOneById(id);
+        
+        let errMsg = "", err = false;
+        
+        if (!post) {
+            errMsg = "Post not found",
+            err = true;
+        } 
+
+        if (post.createdBy !== email) {
+            errMsg = "User not authorized to delete this post";
+            err = true;
+        }
+
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                error: errMsg,
+                data: {}
+            });
+        }
+
         
         const deletedPost = await Post.findByIdAndDelete(id);
         console.log("deletedPosts : ", deletedPost);
