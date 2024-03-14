@@ -80,31 +80,31 @@ const getComment = async(req, res) => {
 };
 
 // @desc     Get User's Comments and its associated Posts  
-// route     POST /api/comments/user
+// route     GET /api/comments/user
 // @access   Private
 const getUserComment = async(req, res) => {
     try {
-        const { email } = req.user;
+        const { _id: userId } = req.user;
 
         const commentsAndPostsList = await Comment.find({
-            post: postId
-        });
+            createdBy: userId,
+        }).populate("postId");
 
-        console.log("Comments : ", commentsList);
+        // console.log("commentsAndPostsList : ", commentsAndPostsList);
 
         return res.status(200).json({
             ok: true, 
             message: "Comments fetched successfully",
             data: {
-                comments: commentsList
+                commentsAndPostsList: commentsAndPostsList
             }
         });
     } catch (err) {
-        console.error(`ERROR (get-all-comments): ${err.message}`);
+        console.error(`ERROR (get-user-all-comments-posts): ${err.message}`);
 
         return res.status(500).json({
             ok: false,
-            error: "Comments fetching failed, Please try again later.",
+            error: "Comments and Posts fetching failed, Please try again later.",
             data: {}
         })
     }
@@ -117,7 +117,7 @@ const getUserComment = async(req, res) => {
 const createComment = async(req, res) => {
     try {
         const { _id: userId } = req.user; 
-        const { content, id: postId } = req.body;
+        const { content, postId } = req.body;
 
         if (!content || !postId) {
             let errMsg = "";
@@ -136,7 +136,7 @@ const createComment = async(req, res) => {
         const createdComment = await Comment.create({
             createdBy: userId,
             content,
-            post: postId
+            postId
         });
 
         console.log("created comment : ", createdComment);
@@ -165,24 +165,24 @@ const createComment = async(req, res) => {
 // @access   Private
 const updateComment = async(req, res) => {
     try {
-        const { email } = req.user; 
-        const { id, content } = req.body;
+        const { _id: userId } = req.user; 
+        const { id: commentId, content } = req.body;
 
-        if (!id) {
-            console.log("ERROR (update-comment): id is required");
-            return res.status(404).json({
+        if (!commentId) {
+            console.log("ERROR (update-comment): comment id is required");
+            return res.status(400).json({
                 ok: false,
                 data: {},
                 error: "Comment id is required",
             }); 
         }
  
-        const comment = await Comment.findById(id);
+        const comment = await Comment.findById(commentId);
         
         //user is not allowed to update this post (as the post is not created by the user)
-        if (comment.createdBy !== email) {
+        if (!comment.createdBy.equals(userId)) {
             console.log("ERROR (update-comment): User not authorized to update this comment");
-            return res.status(404).json({
+            return res.status(401).json({
                 ok: false,
                 data: {},
                 error: "User not authorized to update this comment",
@@ -203,11 +203,11 @@ const updateComment = async(req, res) => {
             }
         });
     } catch (err) {
-        console.error(`ERROR (update-post): ${err.message}`);
+        console.error(`ERROR (update-comment): ${err.message}`);
 
         return res.status(500).json({
             ok: false,
-            error: "Post updating failed, Please try again later.",
+            error: "Comment updating failed, Please try again later.",
             data: {}
         })
     }
@@ -218,11 +218,11 @@ const updateComment = async(req, res) => {
 // @access   Private
 const deleteComment = async(req, res) => {
     try {
-        const { email } = req.user;
-        const { id } = req.params;
+        const { _id: userId } = req.user;
+        const { id: commentId } = req.params;
         
         //TODO: Check the user email to the comment email
-        const comment = await Comment.findOneById(id);
+        const comment = await Comment.findById(commentId);
         
         let errMsg = "", err = false;
         
@@ -231,7 +231,7 @@ const deleteComment = async(req, res) => {
             err = true;
         } 
 
-        if (comment.createdBy !== email) {
+        if (comment && !comment.createdBy.equals(userId)) {
             errMsg = "User not authorized to delete this comment";
             err = true;
         }
@@ -244,7 +244,7 @@ const deleteComment = async(req, res) => {
             });
         }
 
-        const deletedComment = await Comment.findByIdAndDelete(id);
+        const deletedComment = await Comment.findByIdAndDelete(commentId);
         console.log("deletedComment : ", deletedComment);
         
         if (!deletedComment) {
@@ -260,7 +260,7 @@ const deleteComment = async(req, res) => {
             ok: true, 
             message: "Comment deleted successfully",
             data: {
-                comments: deleteComment
+                comments: deletedComment
             }
         });
     } catch (err) {

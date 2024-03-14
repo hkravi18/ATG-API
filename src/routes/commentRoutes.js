@@ -13,13 +13,13 @@ const {
 const authMiddleware = require('../middleware/authMiddleware.js');
 
 router.get('/', getAllComments);
+router.get('/user', authMiddleware, getUserComment);
 router.get('/:id', getComment);
 
 router.use(authMiddleware);
 
 router.post('/', createComment);
-router.post('/user', getUserComment);
 router.put('/', updateComment);
-router.delete('/', deleteComment);
+router.delete('/:id', deleteComment);
 
 module.exports = router;
