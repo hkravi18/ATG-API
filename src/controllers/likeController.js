@@ -43,7 +43,7 @@ const likePost = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Adding Like to Post failed, Please try again later.",
+            error: "Adding Like to Post failed.",
             data: {}
         })
     }
@@ -70,7 +70,7 @@ const getAllLikePosts = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Liked Posts fetching failed, Please try again later.",
+            error: "Liked Posts fetching failed.",
             data: {}
         })
     }

@@ -27,7 +27,7 @@ const getAllComments = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Comments fetching failed, Please try again later.",
+            error: "Comments fetching failed.",
             data: {}
         })
     }
@@ -73,7 +73,7 @@ const getComment = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Comment fetching failed, Please try again later.",
+            error: "Comment fetching failed",
             data: {}
         })
     }
@@ -104,7 +104,7 @@ const getUserComment = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Comments and Posts fetching failed, Please try again later.",
+            error: "Comments and Posts fetching failed",
             data: {}
         })
     }
@@ -153,7 +153,7 @@ const createComment = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Comment creation failed, Please try again later.",
+            error: "Comment creation failed.",
             data: {}
         })
     }
@@ -207,7 +207,7 @@ const updateComment = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Comment updating failed, Please try again later.",
+            error: "Comment updating failed.",
             data: {}
         })
     }
@@ -268,7 +268,7 @@ const deleteComment = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Comments deleting failed, Please try again later.",
+            error: "Comments deletion failed.",
             data: {}
         })
     }

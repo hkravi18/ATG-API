@@ -22,7 +22,7 @@ const getAllPosts = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Posts fetching failed, Please try again later.",
+            error: "Posts fetching failed.",
             data: {}
         })
     }
@@ -68,7 +68,7 @@ const getPost = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Post fetching failed, Please try again later.",
+            error: "Post fetching failed.",
             data: {}
         })
     }
@@ -98,7 +98,7 @@ const getUserPosts = async(req, res) => {
 
         return res.status(200).json({
             ok: true, 
-            message: "User's Posts fetched successfully",
+            message: "User's Posts fetched successfully.",
             data: {
                 posts: userPosts
             }
@@ -108,7 +108,7 @@ const getUserPosts = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "User's Posts fetching failed, Please try again later.",
+            error: "User's Posts fetching failed.",
             data: {}
         })
     }
@@ -125,7 +125,7 @@ const createPost = async(req, res) => {
 
         if (!content) {
             console.log("ERROR (create-post): post content is required");
-            return res.status(404).json({
+            return res.status(400).json({
                 ok: false,
                 data: {},
                 error: "Post content is required",
@@ -152,7 +152,7 @@ const createPost = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Post creating failed, Please try again later.",
+            error: "Post creation failed.",
             data: {}
         })
     }
@@ -206,7 +206,7 @@ const updatePost = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Post updating failed, Please try again later.",
+            error: "Post updating failed.",
             data: {}
         })
     }
@@ -271,7 +271,7 @@ const deletePost = async(req, res) => {
 
         return res.status(500).json({
             ok: false,
-            error: "Posts deleting failed, Please try again later.",
+            error: "Posts deletion failed.",
             data: {}
         })
     }
