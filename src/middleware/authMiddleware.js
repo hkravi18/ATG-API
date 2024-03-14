@@ -27,6 +27,8 @@ const authMiddleware = async(req, res, next) => {
         }
         
         const { email } = data;
+
+        console.log("data : ", data);
         req.user = await User.findOne({ email });
         req.receivedToken = token;
 

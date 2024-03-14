@@ -5,10 +5,10 @@ const Comment = require('../models/commentModel.js');
 // @desc     Get All Posts 
 // route     GET /api/posts
 // @access   Public
-const getAllPosts = async() => {
+const getAllPosts = async(req, res) => {
     try {
-        const postsList = await Post.findOne({});
-        console.log("posts : ", postsList);
+        const postsList = await Post.find({});
+        // console.log("posts : ", postsList);
 
         return res.status(200).json({
             ok: true, 
@@ -31,12 +31,12 @@ const getAllPosts = async() => {
 // @desc     Get Single Posts 
 // route     GET /api/posts/:id
 // @access   Public
-const getPost = async() => {
+const getPost = async(req, res) => {
     try {
         const { id } = req.params;
         
         if (!id) {
-            console.log("ERROR (get-single-post): id is required");
+            console.log("ERROR (get-single-post): post id is required");
             return res.status(404).json({
                 ok: false,
                 data: {},
@@ -45,7 +45,7 @@ const getPost = async() => {
         }
         
         const post = await Post.findById(id);
-        console.log("Fetched Post : ", post);
+        // console.log("Fetched Post : ", post);
 
         if (!post) {
             console.log("ERROR (get-single-post): post does not exists");
@@ -75,16 +75,56 @@ const getPost = async() => {
 };
 
 
+// @desc     Get User Posts 
+// route     POST /api/posts/user
+// @access   Public
+const getUserPosts = async(req, res) => {
+    try {
+        const { _id: userId } = req.body;
+        
+        if (!userId) {
+            console.log("ERROR (get-user-posts): userId is required");
+            return res.status(404).json({
+                ok: false,
+                data: {},
+                error: "User ID is required",
+            }); 
+        }
+        
+        const userPosts = await Post.find({
+            createdBy: userId
+        });
+        // console.log("Fetched User Posts : ", userPosts);
+
+        return res.status(200).json({
+            ok: true, 
+            message: "User's Posts fetched successfully",
+            data: {
+                posts: userPosts
+            }
+        });
+    } catch (err) {
+        console.error(`ERROR (get-user-posts): ${err.message}`);
+
+        return res.status(500).json({
+            ok: false,
+            error: "User's Posts fetching failed, Please try again later.",
+            data: {}
+        })
+    }
+};
+
+
 // @desc     Create Post 
 // route     POST /api/posts
 // @access   Private
-const createPost = async() => {
+const createPost = async(req, res) => {
     try {
-        const { email } = req.user; 
+        const { _id: userId } = req.user; 
         const { content } = req.body;
 
         if (!content) {
-            console.log("ERROR (update-post): post content is required");
+            console.log("ERROR (create-post): post content is required");
             return res.status(404).json({
                 ok: false,
                 data: {},
@@ -93,12 +133,12 @@ const createPost = async() => {
         }
  
         const createdPost = await Post.create({
-            createdBy: email,
+            createdBy: userId,
             content,
             likes: [],
         });
 
-        console.log("created post : ", createdPost);
+        // console.log("created post : ", createdPost);
 
         return res.status(200).json({
             ok: true, 
@@ -122,12 +162,12 @@ const createPost = async() => {
 // @desc     Update Post 
 // route     PUT /api/posts
 // @access   Private
-const updatePost = async() => {
+const updatePost = async(req, res) => {
     try {
-        const { email } = req.user; 
-        const { id, content } = req.body;
+        const { _id: userId } = req.user; 
+        const { id: postId, content: newContent } = req.body;
 
-        if (!id) {
+        if (!postId) {
             console.log("ERROR (update-post): id is required");
             return res.status(404).json({
                 ok: false,
@@ -136,10 +176,10 @@ const updatePost = async() => {
             }); 
         }
  
-        const post = await Post.findById(id);
-        
+        const post = await Post.findById(postId);
+    
         //user is not allowed to update this post (as the post is not created by the user)
-        if (post.createdBy !== email) {
+        if (!post.createdBy.equals(userId)) {
             console.log("ERROR (update-post): User not authorized to update this post");
             return res.status(404).json({
                 ok: false,
@@ -149,10 +189,10 @@ const updatePost = async() => {
         }
 
         //updating the post
-        post.content = content; 
+        post.content = newContent; 
         post.save();
 
-        console.log("updated post : ", post);
+        // console.log("updated post : ", post);
 
         return res.status(200).json({
             ok: true, 
@@ -175,12 +215,12 @@ const updatePost = async() => {
 // @desc     Delete Post 
 // route     DELETE /api/posts/:id
 // @access   Private
-const deletePost = async() => {
+const deletePost = async(req, res) => {
     try {
-        const { email } = req.user;
+        const { _id: userId } = req.user;
         const { id } = req.params;
 
-        const post = await Post.findOneById(id);
+        const post = await Post.findById(id);
         
         let errMsg = "", err = false;
         
@@ -189,7 +229,7 @@ const deletePost = async() => {
             err = true;
         } 
 
-        if (post.createdBy !== email) {
+        if (post && !post.createdBy.equals(userId)) {
             errMsg = "User not authorized to delete this post";
             err = true;
         }
@@ -204,7 +244,7 @@ const deletePost = async() => {
 
         
         const deletedPost = await Post.findByIdAndDelete(id);
-        console.log("deletedPosts : ", deletedPost);
+        // console.log("deletedPosts : ", deletedPost);
         
         if (!deletedPost) {
             console.log("ERROR (delete-post): post does not exists");
@@ -216,13 +256,14 @@ const deletePost = async() => {
         }
 
         //deleting all the comments for this post
-        await Comment.deleteMany({ post: id });
+        await Comment.deleteMany({ postId: id });
 
+        
         return res.status(200).json({
             ok: true, 
             message: "Post deleted successfully",
             data: {
-                posts: deletePost
+                posts: deletedPost
             }
         });
     } catch (err) {
@@ -240,6 +281,7 @@ const deletePost = async() => {
 module.exports = {
     getPost,
     getAllPosts,
+    getUserPosts,
     createPost,
     updatePost,
     deletePost

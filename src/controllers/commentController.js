@@ -5,7 +5,7 @@ const Comment = require('../models/commentModel.js');
 // @desc     Get All Comments For A Post 
 // route     GET /api/comments
 // @access   Public
-const getAllComments = async() => {
+const getAllComments = async(req, res) => {
     try {
         const { id: postId } = req.params;
 
@@ -36,7 +36,7 @@ const getAllComments = async() => {
 // @desc     Get Single Comment 
 // route     GET /api/comments/:id
 // @access   Public
-const getPost = async() => {
+const getComment = async(req, res) => {
     try {
         const { id: commentId } = req.params;
         
@@ -52,7 +52,7 @@ const getPost = async() => {
         const comment = await Comment.findById(commentId);
         console.log("Fetched Comment : ", comment);
 
-        if (!post) {
+        if (!comment) {
             console.log("ERROR (get-single-comment): comment does not exists");
             return res.status(404).json({
                 ok: false,
@@ -79,14 +79,45 @@ const getPost = async() => {
     }
 };
 
+// @desc     Get User's Comments and its associated Posts  
+// route     POST /api/comments/user
+// @access   Private
+const getUserComment = async(req, res) => {
+    try {
+        const { email } = req.user;
+
+        const commentsAndPostsList = await Comment.find({
+            post: postId
+        });
+
+        console.log("Comments : ", commentsList);
+
+        return res.status(200).json({
+            ok: true, 
+            message: "Comments fetched successfully",
+            data: {
+                comments: commentsList
+            }
+        });
+    } catch (err) {
+        console.error(`ERROR (get-all-comments): ${err.message}`);
+
+        return res.status(500).json({
+            ok: false,
+            error: "Comments fetching failed, Please try again later.",
+            data: {}
+        })
+    }
+};
+
 
 // @desc     Create Comment 
 // route     POST /api/comments
 // @access   Private
-const createPost = async() => {
+const createComment = async(req, res) => {
     try {
-        const { email } = req.user; 
-        const { content, postId } = req.body;
+        const { _id: userId } = req.user; 
+        const { content, id: postId } = req.body;
 
         if (!content || !postId) {
             let errMsg = "";
@@ -103,7 +134,7 @@ const createPost = async() => {
         }
  
         const createdComment = await Comment.create({
-            createdBy: email,
+            createdBy: userId,
             content,
             post: postId
         });
@@ -132,7 +163,7 @@ const createPost = async() => {
 // @desc     Update Comment 
 // route     PUT /api/comments
 // @access   Private
-const updatePost = async() => {
+const updateComment = async(req, res) => {
     try {
         const { email } = req.user; 
         const { id, content } = req.body;
@@ -185,7 +216,7 @@ const updatePost = async() => {
 // @desc     Delete Comment 
 // route     DELETE /api/comments/:id
 // @access   Private
-const deleteComment = async() => {
+const deleteComment = async(req, res) => {
     try {
         const { email } = req.user;
         const { id } = req.params;
@@ -247,6 +278,7 @@ const deleteComment = async() => {
 module.exports = {
     getAllComments,
     getComment,
+    getUserComment,
     createComment,
     updateComment,
     deleteComment
