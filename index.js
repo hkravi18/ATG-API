@@ -12,6 +12,7 @@ const authRoutes = require('./src/routes/authRoutes.js');
 const passwordRoutes = require('./src/routes/passwordRoutes.js');
 const postRoutes = require('./src/routes/postRoutes.js');
 const commentRoutes = require('./src/routes/commentRoutes.js');
+const likeRoutes = require('./src/routes/likeRoutes.js');
 
 //middlewares 
 const logger = require('./src/middleware/loggerMiddleware.js');
@@ -24,6 +25,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/password', passwordRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/like', likeRoutes);
 
 //database connection
 connectDB()
