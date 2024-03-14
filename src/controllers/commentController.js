@@ -1,5 +1,5 @@
 //models
-const Post = require('../models/postModel.js');
+// const Post = require('../models/postModel.js');
 const Comment = require('../models/commentModel.js');
  
 // @desc     Get All Comments For A Post 
@@ -45,7 +45,7 @@ const getComment = async(req, res) => {
             return res.status(404).json({
                 ok: false,
                 data: {},
-                error: "Post id is required",
+                error: "Comment id is required",
             }); 
         }
         
