@@ -1,15 +1,14 @@
 const customLogger = (req, res, next) => {
-    const now = new Date();
-    
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
+  const now = new Date();
 
-    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
 
-    console.log(`[${formattedTime}] ${req.method} ${req.originalUrl}`);
-    next();
-}
-  
+  const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+  console.log(`[${formattedTime}] ${req.method} ${req.originalUrl}`);
+  next();
+};
+
 module.exports = customLogger;
-  
