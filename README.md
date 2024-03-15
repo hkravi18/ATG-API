@@ -7,7 +7,7 @@ This is a simple project based on MERN tech stack for basic user authentication 
 ## Table of Contents
 
 - [Features](#features)
-- [Developer Features](#developer-features)
+- [Development Features](#development-features)
 - [Technologies Used](#technologies-used)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
@@ -26,7 +26,7 @@ This is a simple project based on MERN tech stack for basic user authentication 
 - Users can create Posts and Comments
 - Users can like Posts of other users
 
-## Developer Features
+## Development Features
 
 - Custom Logger is made for logging every request to the server
 - Eslint is used for linting and for finding errors with standard rules
