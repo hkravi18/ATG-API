@@ -45,7 +45,7 @@ const getComment = async (req, res) => {
 
     if (!commentId) {
       console.log("ERROR (get-single-comment): id is required");
-      return res.status(404).json({
+      return res.status(400).json({
         ok: false,
         data: {},
         error: "Comment id is required",

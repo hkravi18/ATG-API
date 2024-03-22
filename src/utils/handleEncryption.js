@@ -7,13 +7,6 @@ const encrypt = (data) => {
   return encryptedData;
 };
 
-// // Decrypt
-// const decrypt = (data) => {
-//   const bytes = CryptoJS.AES.decrypt(data, encryptionKey);
-//   const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-//   return decryptedData;
-// };
-
 const decrypt = (data) => {
   try {
     const bytes = CryptoJS.AES.decrypt(data, encryptionKey);

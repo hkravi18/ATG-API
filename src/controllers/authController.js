@@ -25,7 +25,7 @@ const signup = async (req, res) => {
 
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
-      return res.status(500).json({
+      return res.status(409).json({
         ok: false,
         error: "User already exists. Please Login",
         data: {},
@@ -100,7 +100,7 @@ const login = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({
+      return res.status(401).json({
         ok: false,
         error: "Incorrect email or password",
         data: {},

@@ -39,7 +39,7 @@ const getPost = async (req, res) => {
 
     if (!id) {
       console.log("ERROR (get-single-post): post id is required");
-      return res.status(404).json({
+      return res.status(400).json({
         ok: false,
         data: {},
         error: "Post id is required",
@@ -138,7 +138,7 @@ const createPost = async (req, res) => {
       likes: [],
     });
 
-    console.log("created post : ", createdPost);
+    // console.log("created post : ", createdPost);
 
     return res.status(200).json({
       ok: true,
@@ -193,7 +193,7 @@ const updatePost = async (req, res) => {
     post.content = newContent;
     await post.save();
 
-    console.log("updated post : ", post);
+    // console.log("updated post : ", post);
 
     return res.status(200).json({
       ok: true,

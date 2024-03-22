@@ -14,7 +14,7 @@ const likePost = async (req, res) => {
 
     if (!postId) {
       console.log("ERROR (like-post): Post Id is required");
-      return res.status(404).json({
+      return res.status(400).json({
         ok: false,
         data: {},
         error: "Post Id is required",
@@ -71,7 +71,7 @@ const getAllLikePosts = async (req, res) => {
       likes: userId,
     });
 
-    console.log("decrypt : ", decryptContent(likedPosts));
+    // console.log("decrypt : ", decryptContent(likedPosts));
 
     return res.status(200).json({
       ok: true,
