@@ -2,6 +2,9 @@
 const Post = require("../models/postModel.js");
 const Comment = require("../models/commentModel.js");
 
+//decryption util function
+const decryptContent = require("../utils/decryptData.js");
+
 // @desc     Like Post
 // route     POST /api/post/like
 // @access   Private
@@ -63,7 +66,7 @@ const getAllLikePosts = async (req, res) => {
     return res.status(200).json({
       ok: true,
       messages: "Liked Posts fetched Successfully",
-      data: likedPosts,
+      data: decryptContent(likedPosts),
     });
   } catch (err) {
     console.error(`ERROR (user-like-post): ${err.message}`);

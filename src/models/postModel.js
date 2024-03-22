@@ -25,8 +25,9 @@ const postSchema = new Schema({
 //encrypting the content before saving
 postSchema.pre("save", function (next) {
   if (this.content) {
-    const encryptedContent = encrypt(this.content);
-    this.content = JSON.stringify(encryptedContent);
+    this.content = encrypt(this.content);
+    console.log("this.content : ", this.content);
+    // this.content = JSON.stringify(encryptedContent);
   }
   next();
 });

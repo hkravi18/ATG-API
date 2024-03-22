@@ -2,19 +2,21 @@
 const Post = require("../models/postModel.js");
 const Comment = require("../models/commentModel.js");
 
+//decryption util function
+const decryptContent = require("../utils/decryptData.js");
+
 // @desc     Get All Posts
 // route     GET /api/posts
 // @access   Public
 const getAllPosts = async (req, res) => {
   try {
     const postsList = await Post.find({});
-    // console.log("posts : ", postsList);
 
     return res.status(200).json({
       ok: true,
       message: "Posts fetched successfully",
       data: {
-        posts: postsList,
+        posts: decryptContent(postsList),
       },
     });
   } catch (err) {
@@ -60,7 +62,7 @@ const getPost = async (req, res) => {
       ok: true,
       message: "Post fetched successfully",
       data: {
-        posts: post,
+        posts: decryptContent(post),
       },
     });
   } catch (err) {
@@ -99,7 +101,7 @@ const getUserPosts = async (req, res) => {
       ok: true,
       message: "User's Posts fetched successfully.",
       data: {
-        posts: userPosts,
+        posts: decryptContent(userPosts),
       },
     });
   } catch (err) {
@@ -136,17 +138,17 @@ const createPost = async (req, res) => {
       likes: [],
     });
 
-    // console.log("created post : ", createdPost);
+    console.log("created post : ", createdPost);
 
     return res.status(200).json({
       ok: true,
       message: "Post created successfully",
       data: {
-        posts: createdPost,
+        posts: decryptContent(createdPost),
       },
     });
   } catch (err) {
-    console.error(`ERROR (create-post): ${err.message}`);
+    console.error(`ERROR (create-post): ${err}`);
 
     return res.status(500).json({
       ok: false,
@@ -191,13 +193,13 @@ const updatePost = async (req, res) => {
     post.content = newContent;
     post.save();
 
-    // console.log("updated post : ", post);
+    console.log("updated post : ", post);
 
     return res.status(200).json({
       ok: true,
       message: "Post updated successfully",
       data: {
-        posts: post,
+        posts: decryptContent(post),
       },
     });
   } catch (err) {
@@ -260,7 +262,7 @@ const deletePost = async (req, res) => {
       ok: true,
       message: "Post deleted successfully",
       data: {
-        posts: deletedPost,
+        posts: decryptContent(deletedPost),
       },
     });
   } catch (err) {

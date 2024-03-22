@@ -1,5 +1,5 @@
-const DB_NAME = "ATG-POSTS";
+const DB_NAME = "ATG-POSTS-3";
 
 module.exports = {
-    DB_NAME 
+  DB_NAME,
 };

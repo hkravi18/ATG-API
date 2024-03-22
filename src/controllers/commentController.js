@@ -2,6 +2,9 @@
 // const Post = require("../models/postModel.js");
 const Comment = require("../models/commentModel.js");
 
+//decryption util function
+const decryptContent = require("../utils/decryptData.js");
+
 // @desc     Get All Comments For A Post
 // route     GET /api/comments
 // @access   Public
@@ -13,13 +16,13 @@ const getAllComments = async (req, res) => {
       post: postId,
     });
 
-    console.log("Comments : ", commentsList);
+    // console.log("Comments : ", commentsList);
 
     return res.status(200).json({
       ok: true,
       message: "Comments fetched successfully",
       data: {
-        comments: commentsList,
+        comments: decryptContent(commentsList),
       },
     });
   } catch (err) {
@@ -50,7 +53,7 @@ const getComment = async (req, res) => {
     }
 
     const comment = await Comment.findById(commentId);
-    console.log("Fetched Comment : ", comment);
+    // console.log("Fetched Comment : ", comment);
 
     if (!comment) {
       console.log("ERROR (get-single-comment): comment does not exists");
@@ -65,7 +68,7 @@ const getComment = async (req, res) => {
       ok: true,
       message: "Comment fetched successfully",
       data: {
-        comments: comment,
+        comments: decryptContent(comment),
       },
     });
   } catch (err) {
@@ -96,7 +99,7 @@ const getUserComment = async (req, res) => {
       ok: true,
       message: "Comments fetched successfully",
       data: {
-        commentsAndPostsList: commentsAndPostsList,
+        commentsAndPostsList: decryptContent(commentsAndPostsList),
       },
     });
   } catch (err) {
@@ -142,13 +145,13 @@ const createComment = async (req, res) => {
       postId,
     });
 
-    console.log("created comment : ", createdComment);
+    // console.log("created comment : ", createdComment);
 
     return res.status(200).json({
       ok: true,
       message: "Comment created successfully",
       data: {
-        comments: createdComment,
+        comments: decryptContent(createdComment),
       },
     });
   } catch (err) {
@@ -197,13 +200,13 @@ const updateComment = async (req, res) => {
     comment.content = content;
     comment.save();
 
-    console.log("updated comment : ", comment);
+    // console.log("updated comment : ", comment);
 
     return res.status(200).json({
       ok: true,
       message: "Comment updated successfully",
       data: {
-        comments: comment,
+        comments: decryptContent(comment),
       },
     });
   } catch (err) {
@@ -249,7 +252,7 @@ const deleteComment = async (req, res) => {
     }
 
     const deletedComment = await Comment.findByIdAndDelete(commentId);
-    console.log("deletedComment : ", deletedComment);
+    // console.log("deletedComment : ", deletedComment);
 
     if (!deletedComment) {
       console.log("ERROR (delete-comment): comment does not exists");
@@ -264,7 +267,7 @@ const deleteComment = async (req, res) => {
       ok: true,
       message: "Comment deleted successfully",
       data: {
-        comments: deletedComment,
+        comments: decryptContent(deletedComment),
       },
     });
   } catch (err) {
