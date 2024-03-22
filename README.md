@@ -25,6 +25,7 @@ This is a simple project based on MERN tech stack for basic user authentication 
 - Email is send to given email address on forget password
 - Users can create Posts and Comments
 - Users can like Posts of other users
+- Secure measures on posts and comments content
 
 ## Development Features
 
@@ -33,6 +34,7 @@ This is a simple project based on MERN tech stack for basic user authentication 
 - Prettier is used for code formatting
 - Lint-staged is used for running prettier and eslint on all changed files in each commit
 - Husky is used to provide git hooks for pre-commit and pre-push
+- Crypto-js is used for data encryption
 
 ## Technologies Used
 
@@ -81,7 +83,7 @@ FOR EXAMPLE:
 PORT=4000
 MONGO_URI=<MONGODB_URI>
 SECRET_KEY=any_secret_key
-
+ENCRYPTION_KEY=
 # Email environment variables
 USER_EMAIL=
 USER_PASSWORD=
@@ -113,6 +115,7 @@ Login is done with username (unique)
 - Bcrypt is used to encrypt the passwords before saving to the database.
 - JWT is used to authenticate the user
 - Nodemailer is used to send a resetting password email (currently restricted to google email accounts only).
+- Crypto-js is used to encrypt/decrypt the data with AES encryption algorithm
 
 ## Database
 

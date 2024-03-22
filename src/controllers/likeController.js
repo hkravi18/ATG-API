@@ -32,6 +32,15 @@ const likePost = async (req, res) => {
       });
     }
 
+    if (post.likes.includes(userId)) {
+      console.log("ERROR (like-post): Like already exists");
+      return res.status(400).json({
+        ok: false,
+        data: {},
+        error: "Post is already liked by user",
+      });
+    }
+
     post.likes.push(userId);
     await post.save();
 
