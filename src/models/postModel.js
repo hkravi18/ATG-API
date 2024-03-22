@@ -1,6 +1,9 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
+//data encryption and decryption
+const { encrypt, decrypt } = require("../utils/handleEncryption.js");
+
 const postSchema = new Schema({
   createdBy: {
     type: Schema.Types.ObjectId,
@@ -18,6 +21,22 @@ const postSchema = new Schema({
     },
   ],
 });
+
+//encrypting the content before saving
+postSchema.pre("save", function (next) {
+  if (this.content) {
+    this.content = encrypt(this.content);
+  }
+  next();
+});
+
+//mongoose method for decrypting the content
+postSchema.methods.decryptContent = function () {
+  if (this.content) {
+    return decrypt(this.content);
+  }
+  return null;
+};
 
 const Post = mongoose.model("Post", postSchema);
 module.exports = Post;
