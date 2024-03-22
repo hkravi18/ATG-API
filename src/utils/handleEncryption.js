@@ -11,7 +11,6 @@ const decrypt = (data) => {
   try {
     const bytes = CryptoJS.AES.decrypt(data, encryptionKey);
     const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
-    console.log(`data: ${data}, decryptedData: ${decryptedData}`);
     if (!decryptedData) {
       throw new Error("Failed to decrypt or data is empty.");
     }
