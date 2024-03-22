@@ -16,6 +16,7 @@ const likeRoutes = require("./src/routes/likeRoutes.js");
 
 //middlewares
 const logger = require("./src/middleware/loggerMiddleware.js");
+const errorHandler = require("./src/middleware/errorHandler.js");
 
 //logger middleware
 app.use(logger);
@@ -26,6 +27,9 @@ app.use("/api/password", passwordRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/like", likeRoutes);
+
+//custom error handler
+app.use(errorHandler);
 
 //database connection
 connectDB()

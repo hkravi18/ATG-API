@@ -6,30 +6,29 @@ const User = require("../models/userModel.js");
 //utils
 const handleValidation = require("../utils/handleValidation.js");
 const { generateToken } = require("../utils/handleJWT.js");
+const customToken = require("../utils/customToken.js");
 
 // @desc     User Signup
 // route     POST /api/auth/signup
 // @access   Public
-const signup = async (req, res) => {
+const signup = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
 
     const validationRes = handleValidation(username, email, password, "signup");
     if (!validationRes.valid) {
-      return res.status(400).json({
-        ok: false,
-        error: validationRes.error,
-        data: {},
-      });
+      const error = new CustomError(validationRes.error, 409, "signup");
+      next(error);
     }
 
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
-      return res.status(500).json({
-        ok: false,
-        error: "User already exists. Please Login",
-        data: {},
-      });
+      const error = new CustomError(
+        "User already exists. Please Login",
+        500,
+        "signup"
+      );
+      next(error);
     }
 
     //hashing the password
@@ -62,20 +61,21 @@ const signup = async (req, res) => {
         },
       });
     } else {
-      return res.status(500).json({
-        ok: false,
-        error: "User Registration failed, Please try again.",
-        data: {},
-      });
+      const error = new CustomError(
+        "User Registration failed, Please try again.",
+        500,
+        "signup"
+      );
+      next(error);
     }
   } catch (err) {
     console.error(`ERROR (signup): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "User Registration failed, Please try again later.",
-      data: {},
-    });
+    const error = new CustomError(
+      "User Registration failed, Please try again.",
+      500,
+      "signup"
+    );
+    next(error);
   }
 };
 
@@ -88,11 +88,8 @@ const login = async (req, res) => {
 
     const validationRes = handleValidation(username, "", password, "login");
     if (!validationRes.valid) {
-      return res.status(400).json({
-        ok: false,
-        error: validationRes.error,
-        data: {},
-      });
+      const error = new CustomError(validationRes.error, 400, "login");
+      next(error);
     }
 
     const user = await User.findOne({
@@ -100,21 +97,23 @@ const login = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({
-        ok: false,
-        error: "Incorrect email or password",
-        data: {},
-      });
+      const error = new CustomError(
+        "Incorrect email or password",
+        401,
+        "login"
+      );
+      next(error);
     }
 
     const checkPassword = await bcrypt.compare(password, user.password);
 
     if (!checkPassword) {
-      return res.status(401).json({
-        ok: false,
-        error: "Incorrect email or password",
-        data: {},
-      });
+      const error = new CustomError(
+        "Incorrect email or password",
+        401,
+        "login"
+      );
+      next(error);
     }
 
     const token = generateToken(
@@ -138,11 +137,12 @@ const login = async (req, res) => {
   } catch (err) {
     console.error(`ERROR (login): ${err.message}`);
 
-    return res.status(500).json({
-      ok: false,
-      error: "User Logged In failed. Please try again.",
-      data: {},
-    });
+    const error = new CustomError(
+      "User Logged In failed. Please try again.",
+      500,
+      "login"
+    );
+    next(error);
   }
 };
 

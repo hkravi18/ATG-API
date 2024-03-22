@@ -84,10 +84,14 @@ PORT=4000
 MONGO_URI=<MONGODB_URI>
 SECRET_KEY=any_secret_key
 ENCRYPTION_KEY=
+NODE_ENV=
+
 # Email environment variables
 USER_EMAIL=
 USER_PASSWORD=
 ```
+
+**NODE_ENV can be 'development' or 'production' and accordingly show the error details**
 
 **If you are using local mongodb MONGO_URI=`mongodb://localhost:27017`**
 

@@ -5,6 +5,9 @@ const Comment = require("../models/commentModel.js");
 //decryption util function
 const decryptContent = require("../utils/decryptContent.js");
 
+//utils
+const CustomError = require("../utils/customError.js");
+
 // @desc     Get All Posts
 // route     GET /api/posts
 // @access   Public
@@ -21,12 +24,12 @@ const getAllPosts = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (get-all-posts): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "Posts fetching failed.",
-      data: {},
-    });
+    const error = new CustomError(
+      "Posts fetching failed.",
+      500,
+      "get-all-posts"
+    );
+    next(error);
   }
 };
 
@@ -38,24 +41,24 @@ const getPost = async (req, res) => {
     const { id } = req.params;
 
     if (!id) {
-      console.log("ERROR (get-single-post): post id is required");
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: "Post id is required",
-      });
+      const error = new CustomError(
+        "Post id is required",
+        400,
+        "get-single-post"
+      );
+      next(error);
     }
 
     const post = await Post.findById(id);
     // console.log("Fetched Post : ", post);
 
     if (!post) {
-      console.log("ERROR (get-single-post): post does not exists");
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: "Post with given id does not exist",
-      });
+      const error = new CustomError(
+        "Post with given id does not exist",
+        404,
+        "get-single-post"
+      );
+      next(error);
     }
 
     return res.status(200).json({
@@ -67,12 +70,12 @@ const getPost = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (get-single-post): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "Post fetching failed.",
-      data: {},
-    });
+    const error = new CustomError(
+      "Post fetching failed.",
+      500,
+      "get-single-post"
+    );
+    next(error);
   }
 };
 
@@ -84,12 +87,12 @@ const getUserPosts = async (req, res) => {
     const { _id: userId } = req.body;
 
     if (!userId) {
-      console.log("ERROR (get-user-posts): userId is required");
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: "User ID is required",
-      });
+      const error = new CustomError(
+        "User ID is required.",
+        404,
+        "get-user-posts"
+      );
+      next(error);
     }
 
     const userPosts = await Post.find({
@@ -106,12 +109,12 @@ const getUserPosts = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (get-user-posts): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "User's Posts fetching failed.",
-      data: {},
-    });
+    const error = new CustomError(
+      "User's Posts fetching failed.",
+      500,
+      "get-user-posts"
+    );
+    next(error);
   }
 };
 
@@ -124,12 +127,12 @@ const createPost = async (req, res) => {
     const { content } = req.body;
 
     if (!content) {
-      console.log("ERROR (create-post): post content is required");
-      return res.status(400).json({
-        ok: false,
-        data: {},
-        error: "Post content is required",
-      });
+      const error = new CustomError(
+        "Post content is required.",
+        400,
+        "create-post"
+      );
+      next(error);
     }
 
     const createdPost = await Post.create({
@@ -138,7 +141,7 @@ const createPost = async (req, res) => {
       likes: [],
     });
 
-    console.log("created post : ", createdPost);
+    // console.log("created post : ", createdPost);
 
     return res.status(200).json({
       ok: true,
@@ -149,12 +152,8 @@ const createPost = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (create-post): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "Post creation failed.",
-      data: {},
-    });
+    const error = new CustomError("Post creation failed.", 500, "create-post");
+    next(error);
   }
 };
 
@@ -167,33 +166,36 @@ const updatePost = async (req, res) => {
     const { id: postId, content: newContent } = req.body;
 
     if (!postId) {
-      console.log("ERROR (update-post): id is required");
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: "Post id is required",
-      });
+      const error = new CustomError("Post id is required.", 400, "update-post");
+      next(error);
     }
 
     const post = await Post.findById(postId);
 
-    //user is not allowed to update this post (as the post is not created by the user)
-    if (!post.createdBy.equals(userId)) {
-      console.log(
-        "ERROR (update-post): User not authorized to update this post"
+    if (!post) {
+      const error = new CustomError(
+        "Post with given id does not exist.",
+        404,
+        "update-post"
       );
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: "User not authorized to update this post",
-      });
+      next(error);
+    }
+
+    //user is not allowed to update this post (as the post is not created by the user)
+    if (post && !post.createdBy.equals(userId)) {
+      const error = new CustomError(
+        "User not authorized to update this post.",
+        401,
+        "update-post"
+      );
+      next(error);
     }
 
     //updating the post
     post.content = newContent;
     await post.save();
 
-    console.log("updated post : ", post);
+    // console.log("updated post : ", post);
 
     return res.status(200).json({
       ok: true,
@@ -204,12 +206,8 @@ const updatePost = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (update-post): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "Post updating failed.",
-      data: {},
-    });
+    const error = new CustomError("Post updating failed.", 500, "update-post");
+    next(error);
   }
 };
 
@@ -236,23 +234,20 @@ const deletePost = async (req, res) => {
     }
 
     if (err) {
-      return res.status(400).json({
-        ok: false,
-        error: errMsg,
-        data: {},
-      });
+      const error = new CustomError(errMsg, 400, "delete-post");
+      next(error);
     }
 
     const deletedPost = await Post.findByIdAndDelete(id);
     // console.log("deletedPosts : ", deletedPost);
 
     if (!deletedPost) {
-      console.log("ERROR (delete-post): post does not exists");
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: "Post with given id does not exist",
-      });
+      const error = new CustomError(
+        "Post with given id does not exist",
+        404,
+        "delete-post"
+      );
+      next(error);
     }
 
     //deleting all the comments for this post
@@ -267,12 +262,8 @@ const deletePost = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (delete-posts): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "Posts deletion failed.",
-      data: {},
-    });
+    const error = new CustomError("Posts deletion failed.", 500, "delete-post");
+    next(error);
   }
 };
 

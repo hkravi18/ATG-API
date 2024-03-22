@@ -1,9 +1,11 @@
 //models
-// const Post = require("../models/postModel.js");
 const Comment = require("../models/commentModel.js");
 
 //decryption util function
 const decryptContent = require("../utils/decryptContent.js");
+
+//utils
+const CustomError = require("../utils/customError.js");
 
 // @desc     Get All Comments For A Post
 // route     GET /api/comments
@@ -28,11 +30,12 @@ const getAllComments = async (req, res) => {
   } catch (err) {
     console.error(`ERROR (get-all-comments): ${err.message}`);
 
-    return res.status(500).json({
-      ok: false,
-      error: "Comments fetching failed.",
-      data: {},
-    });
+    const error = new CustomError(
+      "Comments fetching failed.",
+      500,
+      "get-all-comments"
+    );
+    next(error);
   }
 };
 
@@ -44,24 +47,24 @@ const getComment = async (req, res) => {
     const { id: commentId } = req.params;
 
     if (!commentId) {
-      console.log("ERROR (get-single-comment): id is required");
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: "Comment id is required",
-      });
+      const error = new CustomError(
+        "Comment id is required",
+        404,
+        "get-single-comment"
+      );
+      next(error);
     }
 
     const comment = await Comment.findById(commentId);
     // console.log("Fetched Comment : ", comment);
 
     if (!comment) {
-      console.log("ERROR (get-single-comment): comment does not exists");
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: "Comment with given id does not exist",
-      });
+      const error = new CustomError(
+        "Comment with given id does not exist",
+        404,
+        "get-single-comment"
+      );
+      next(error);
     }
 
     return res.status(200).json({
@@ -73,12 +76,12 @@ const getComment = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (get-single-comment): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "Comment fetching failed",
-      data: {},
-    });
+    const error = new CustomError(
+      "Comment fetching failed",
+      500,
+      "get-single-comment"
+    );
+    next(error);
   }
 };
 
@@ -105,11 +108,12 @@ const getUserComment = async (req, res) => {
   } catch (err) {
     console.error(`ERROR (get-user-all-comments-posts): ${err.message}`);
 
-    return res.status(500).json({
-      ok: false,
-      error: "Comments and Posts fetching failed",
-      data: {},
-    });
+    const error = new CustomError(
+      "Comments and Posts fetching failed",
+      404,
+      "get-user-all-comments-posts"
+    );
+    next(error);
   }
 };
 
@@ -131,12 +135,8 @@ const createComment = async (req, res) => {
         errMsg = "Post ID is required";
       }
 
-      console.log(`ERROR (create-comment): ${errMsg}`);
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: errMsg,
-      });
+      const error = new CustomError(errMsg, 400, "create-comment");
+      next(error);
     }
 
     const createdComment = await Comment.create({
@@ -145,7 +145,7 @@ const createComment = async (req, res) => {
       postId,
     });
 
-    console.log("created comment : ", createdComment);
+    // console.log("created comment : ", createdComment);
 
     return res.status(200).json({
       ok: true,
@@ -156,12 +156,12 @@ const createComment = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (create-comment): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "Comment creation failed.",
-      data: {},
-    });
+    const error = new CustomError(
+      "Comment creation failed.",
+      500,
+      "create-comment"
+    );
+    next(error);
   }
 };
 
@@ -174,26 +174,33 @@ const updateComment = async (req, res) => {
     const { id: commentId, content } = req.body;
 
     if (!commentId) {
-      console.log("ERROR (update-comment): comment id is required");
-      return res.status(400).json({
-        ok: false,
-        data: {},
-        error: "Comment id is required",
-      });
+      const error = new CustomError(
+        "Comment id is required",
+        400,
+        "update-comment"
+      );
+      next(error);
     }
 
     const comment = await Comment.findById(commentId);
 
+    if (!comment) {
+      const error = new CustomError(
+        "Comment with given id does not exists",
+        404,
+        "update-comment"
+      );
+      next(error);
+    }
+
     //user is not allowed to update this post (as the post is not created by the user)
     if (!comment.createdBy.equals(userId)) {
-      console.log(
-        "ERROR (update-comment): User not authorized to update this comment"
+      const error = new CustomError(
+        "User not authorized to update this comment",
+        401,
+        "update-comment"
       );
-      return res.status(401).json({
-        ok: false,
-        data: {},
-        error: "User not authorized to update this comment",
-      });
+      next(error);
     }
 
     //updating the post
@@ -211,12 +218,12 @@ const updateComment = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (update-comment): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "Comment updating failed.",
-      data: {},
-    });
+    const error = new CustomError(
+      "Comment updating failed.",
+      500,
+      "update-comment"
+    );
+    next(error);
   }
 };
 
@@ -244,23 +251,20 @@ const deleteComment = async (req, res) => {
     }
 
     if (err) {
-      return res.status(400).json({
-        ok: false,
-        error: errMsg,
-        data: {},
-      });
+      const error = new CustomError(errMsg, 400, "delete-comment");
+      next(error);
     }
 
     const deletedComment = await Comment.findByIdAndDelete(commentId);
     // console.log("deletedComment : ", deletedComment);
 
     if (!deletedComment) {
-      console.log("ERROR (delete-comment): comment does not exists");
-      return res.status(404).json({
-        ok: false,
-        data: {},
-        error: "Comment with given id does not exist",
-      });
+      const error = new CustomError(
+        "Comment with given id does not exist",
+        404,
+        "delete-comment"
+      );
+      next(error);
     }
 
     return res.status(200).json({
@@ -272,12 +276,12 @@ const deleteComment = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (delete-comments): ${err.message}`);
-
-    return res.status(500).json({
-      ok: false,
-      error: "Comments deletion failed.",
-      data: {},
-    });
+    const error = new CustomError(
+      "Comments deletion failed.",
+      500,
+      "delete-comment"
+    );
+    next(error);
   }
 };
 

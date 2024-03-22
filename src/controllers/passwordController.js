@@ -6,6 +6,7 @@ const User = require("../models/userModel.js");
 //utils
 const { generateToken } = require("../utils/handleJWT.js");
 const sendMail = require("../utils/sendMail.js");
+const CustomError = require("../utils/customError.js");
 
 // @desc     Forget Password
 // route     POST /api/password/forget
@@ -57,20 +58,21 @@ const forgetPassword = async (req, res, next) => {
         data: {},
       });
     } else {
-      console.error(`ERROR (forget-password): ${err.message}`);
-      return res.status(500).json({
-        ok: false,
-        error: "Forget Password failed, Please try again later.",
-        data: {},
-      });
+      const error = new CustomError(
+        "Forget Password failed, Please try again later.",
+        500,
+        "forget-password"
+      );
+      next(error);
     }
   } catch (err) {
     console.error(`ERROR (forget-password): ${err.message}`);
-    return res.status(500).json({
-      ok: false,
-      error: "Forget Password failed, Please try again later.",
-      data: {},
-    });
+    const error = new CustomError(
+      "Forget Password failed, Please try again later.",
+      500,
+      "forget-password"
+    );
+    next(error);
   }
 };
 
@@ -89,11 +91,12 @@ const resetPassword = async (req, res) => {
 
     //token expired or token is tampered
     if (!user) {
-      return res.status(403).json({
-        ok: true,
-        message: "Password reset token is invalid or has expired.",
-        data: {},
-      });
+      const error = new CustomError(
+        "Password reset token is invalid or has expired.",
+        403,
+        "reset-password"
+      );
+      next(error);
     }
 
     //hasing the new password
@@ -112,11 +115,12 @@ const resetPassword = async (req, res) => {
     });
   } catch (err) {
     console.error(`ERROR (reset-password): ${err.message}`);
-    return res.status(500).json({
-      ok: false,
-      error: "Forget Password failed, Please try again later.",
-      data: {},
-    });
+    const error = new CustomError(
+      "Forget Password failed, Please try again later.",
+      500,
+      "reset-password"
+    );
+    next(error);
   }
 };
 
