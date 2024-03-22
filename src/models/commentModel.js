@@ -24,7 +24,8 @@ const commentSchema = new Schema({
 //encrypting the content before saving
 commentSchema.pre("save", function (next) {
   if (this.content) {
-    this.content = encrypt(this.content);
+    const encryptedContent = encrypt(this.content);
+    this.content = JSON.stringify(encryptedContent);
   }
   next();
 });
