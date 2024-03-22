@@ -1,6 +1,7 @@
 class CustomError extends Error {
   constructor(errMsg, statusCode, source) {
     super(errMsg);
+    this.message = errMsg;
     this.statusCode = statusCode;
     this.status = statusCode >= 400 && statusCode < 500 ? "fail" : "error";
     this.isOperational = true;

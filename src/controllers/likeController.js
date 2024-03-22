@@ -10,7 +10,7 @@ const CustomError = require("../utils/customError.js");
 // @desc     Like Post
 // route     POST /api/post/like
 // @access   Private
-const likePost = async (req, res) => {
+const likePost = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
     const { id: postId } = req.params;
@@ -18,6 +18,7 @@ const likePost = async (req, res) => {
     if (!postId) {
       const error = new CustomError("Post Id is required.", 400, "like-post");
       next(error);
+      return;
     }
 
     const post = await Post.findById(postId);
@@ -30,6 +31,7 @@ const likePost = async (req, res) => {
         "like-post"
       );
       next(error);
+      return;
     }
 
     if (post.likes.includes(userId)) {
@@ -39,6 +41,7 @@ const likePost = async (req, res) => {
         "like-post"
       );
       next(error);
+      return;
     }
 
     post.likes.push(userId);
@@ -57,13 +60,14 @@ const likePost = async (req, res) => {
       "like-post"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Get All Liked Posts
 // route     GET /api/like/user
 // @access   Private
-const getAllLikePosts = async (req, res) => {
+const getAllLikePosts = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
 
@@ -84,6 +88,7 @@ const getAllLikePosts = async (req, res) => {
       "user-like-post"
     );
     next(error);
+    return;
   }
 };
 

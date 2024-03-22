@@ -23,28 +23,4 @@ const decryptContent = (docs) => {
   }
 };
 
-// const decryptContent = async (docs) => {
-//   if (docs) {
-//     let plainDocs = docs;
-//     if (Array.isArray(docs)) {
-//       plainDocs = docs.toObject();
-//       plainDocs.forEach((d) => {
-//         if (d.content) {
-//           d.content = decrypt(d.content);
-//         }
-//         if (d?.postId?.content) {
-//           d.postId.content = decrypt(d?.postId?.content);
-//         }
-//       });
-//     } else {
-//       plainDocs = docs.toObject();
-//       if (plainDocs.content) {
-//         plainDocs.content = decrypt(plainDocs.content);
-//       }
-//     }
-//     return plainDocs;
-//   }
-//   return docs;
-// };
-
 module.exports = decryptContent;

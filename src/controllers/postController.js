@@ -11,7 +11,7 @@ const CustomError = require("../utils/customError.js");
 // @desc     Get All Posts
 // route     GET /api/posts
 // @access   Public
-const getAllPosts = async (req, res) => {
+const getAllPosts = async (req, res, next) => {
   try {
     const postsList = await Post.find({});
 
@@ -30,13 +30,14 @@ const getAllPosts = async (req, res) => {
       "get-all-posts"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Get Single Posts
 // route     GET /api/posts/:id
 // @access   Public
-const getPost = async (req, res) => {
+const getPost = async (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -47,6 +48,7 @@ const getPost = async (req, res) => {
         "get-single-post"
       );
       next(error);
+      return;
     }
 
     const post = await Post.findById(id);
@@ -59,6 +61,7 @@ const getPost = async (req, res) => {
         "get-single-post"
       );
       next(error);
+      return;
     }
 
     return res.status(200).json({
@@ -76,13 +79,14 @@ const getPost = async (req, res) => {
       "get-single-post"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Get User Posts
 // route     POST /api/posts/user
 // @access   Public
-const getUserPosts = async (req, res) => {
+const getUserPosts = async (req, res, next) => {
   try {
     const { _id: userId } = req.body;
 
@@ -93,6 +97,7 @@ const getUserPosts = async (req, res) => {
         "get-user-posts"
       );
       next(error);
+      return;
     }
 
     const userPosts = await Post.find({
@@ -115,13 +120,14 @@ const getUserPosts = async (req, res) => {
       "get-user-posts"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Create Post
 // route     POST /api/posts
 // @access   Private
-const createPost = async (req, res) => {
+const createPost = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
     const { content } = req.body;
@@ -133,6 +139,7 @@ const createPost = async (req, res) => {
         "create-post"
       );
       next(error);
+      return;
     }
 
     const createdPost = await Post.create({
@@ -154,13 +161,14 @@ const createPost = async (req, res) => {
     console.error(`ERROR (create-post): ${err.message}`);
     const error = new CustomError("Post creation failed.", 500, "create-post");
     next(error);
+    return;
   }
 };
 
 // @desc     Update Post
 // route     PUT /api/posts
 // @access   Private
-const updatePost = async (req, res) => {
+const updatePost = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
     const { id: postId, content: newContent } = req.body;
@@ -168,6 +176,7 @@ const updatePost = async (req, res) => {
     if (!postId) {
       const error = new CustomError("Post id is required.", 400, "update-post");
       next(error);
+      return;
     }
 
     const post = await Post.findById(postId);
@@ -179,6 +188,7 @@ const updatePost = async (req, res) => {
         "update-post"
       );
       next(error);
+      return;
     }
 
     //user is not allowed to update this post (as the post is not created by the user)
@@ -189,6 +199,7 @@ const updatePost = async (req, res) => {
         "update-post"
       );
       next(error);
+      return;
     }
 
     //updating the post
@@ -208,13 +219,14 @@ const updatePost = async (req, res) => {
     console.error(`ERROR (update-post): ${err.message}`);
     const error = new CustomError("Post updating failed.", 500, "update-post");
     next(error);
+    return;
   }
 };
 
 // @desc     Delete Post
 // route     DELETE /api/posts/:id
 // @access   Private
-const deletePost = async (req, res) => {
+const deletePost = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
     const { id } = req.params;
@@ -236,6 +248,7 @@ const deletePost = async (req, res) => {
     if (err) {
       const error = new CustomError(errMsg, 400, "delete-post");
       next(error);
+      return;
     }
 
     const deletedPost = await Post.findByIdAndDelete(id);
@@ -248,6 +261,7 @@ const deletePost = async (req, res) => {
         "delete-post"
       );
       next(error);
+      return;
     }
 
     //deleting all the comments for this post
@@ -264,6 +278,7 @@ const deletePost = async (req, res) => {
     console.error(`ERROR (delete-posts): ${err.message}`);
     const error = new CustomError("Posts deletion failed.", 500, "delete-post");
     next(error);
+    return;
   }
 };
 

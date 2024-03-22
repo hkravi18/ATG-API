@@ -8,7 +8,7 @@ const errorHandler = (err, req, res, next) => {
     console.error(`ERROR STACK: ${err.stack}`);
   }
 
-  return res.status(err.status).json({
+  return res.status(err.statusCode).json({
     ok: false,
     error: err.message,
     data: {},

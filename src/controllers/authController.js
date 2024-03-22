@@ -6,7 +6,7 @@ const User = require("../models/userModel.js");
 //utils
 const handleValidation = require("../utils/handleValidation.js");
 const { generateToken } = require("../utils/handleJWT.js");
-const customToken = require("../utils/customToken.js");
+const CustomError = require("../utils/customError.js");
 
 // @desc     User Signup
 // route     POST /api/auth/signup
@@ -19,16 +19,18 @@ const signup = async (req, res, next) => {
     if (!validationRes.valid) {
       const error = new CustomError(validationRes.error, 409, "signup");
       next(error);
+      return;
     }
 
     const userAlreadyExists = await User.findOne({ email });
     if (userAlreadyExists) {
       const error = new CustomError(
         "User already exists. Please Login",
-        500,
+        409,
         "signup"
       );
       next(error);
+      return;
     }
 
     //hashing the password
@@ -67,6 +69,7 @@ const signup = async (req, res, next) => {
         "signup"
       );
       next(error);
+      return;
     }
   } catch (err) {
     console.error(`ERROR (signup): ${err.message}`);
@@ -76,13 +79,14 @@ const signup = async (req, res, next) => {
       "signup"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     User Login
 // route     POST /api/auth/login
 // @access   Public
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
@@ -90,6 +94,7 @@ const login = async (req, res) => {
     if (!validationRes.valid) {
       const error = new CustomError(validationRes.error, 400, "login");
       next(error);
+      return;
     }
 
     const user = await User.findOne({
@@ -103,6 +108,8 @@ const login = async (req, res) => {
         "login"
       );
       next(error);
+      return;
+      return;
     }
 
     const checkPassword = await bcrypt.compare(password, user.password);
@@ -114,6 +121,8 @@ const login = async (req, res) => {
         "login"
       );
       next(error);
+      return;
+      return;
     }
 
     const token = generateToken(
@@ -143,6 +152,7 @@ const login = async (req, res) => {
       "login"
     );
     next(error);
+    return;
   }
 };
 

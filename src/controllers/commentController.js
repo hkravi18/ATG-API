@@ -10,7 +10,7 @@ const CustomError = require("../utils/customError.js");
 // @desc     Get All Comments For A Post
 // route     GET /api/comments
 // @access   Public
-const getAllComments = async (req, res) => {
+const getAllComments = async (req, res, next) => {
   try {
     const { id: postId } = req.params;
 
@@ -36,13 +36,14 @@ const getAllComments = async (req, res) => {
       "get-all-comments"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Get Single Comment
 // route     GET /api/comments/:id
 // @access   Public
-const getComment = async (req, res) => {
+const getComment = async (req, res, next) => {
   try {
     const { id: commentId } = req.params;
 
@@ -53,6 +54,7 @@ const getComment = async (req, res) => {
         "get-single-comment"
       );
       next(error);
+      return;
     }
 
     const comment = await Comment.findById(commentId);
@@ -65,6 +67,7 @@ const getComment = async (req, res) => {
         "get-single-comment"
       );
       next(error);
+      return;
     }
 
     return res.status(200).json({
@@ -82,13 +85,14 @@ const getComment = async (req, res) => {
       "get-single-comment"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Get User"s Comments and its associated Posts
 // route     GET /api/comments/user
 // @access   Private
-const getUserComment = async (req, res) => {
+const getUserComment = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
 
@@ -114,13 +118,14 @@ const getUserComment = async (req, res) => {
       "get-user-all-comments-posts"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Create Comment
 // route     POST /api/comments
 // @access   Private
-const createComment = async (req, res) => {
+const createComment = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
     const { content, postId } = req.body;
@@ -137,6 +142,7 @@ const createComment = async (req, res) => {
 
       const error = new CustomError(errMsg, 400, "create-comment");
       next(error);
+      return;
     }
 
     const createdComment = await Comment.create({
@@ -162,13 +168,14 @@ const createComment = async (req, res) => {
       "create-comment"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Update Comment
 // route     PUT /api/comments
 // @access   Private
-const updateComment = async (req, res) => {
+const updateComment = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
     const { id: commentId, content } = req.body;
@@ -180,6 +187,7 @@ const updateComment = async (req, res) => {
         "update-comment"
       );
       next(error);
+      return;
     }
 
     const comment = await Comment.findById(commentId);
@@ -191,6 +199,7 @@ const updateComment = async (req, res) => {
         "update-comment"
       );
       next(error);
+      return;
     }
 
     //user is not allowed to update this post (as the post is not created by the user)
@@ -201,6 +210,7 @@ const updateComment = async (req, res) => {
         "update-comment"
       );
       next(error);
+      return;
     }
 
     //updating the post
@@ -224,13 +234,14 @@ const updateComment = async (req, res) => {
       "update-comment"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Delete Comment
 // route     DELETE /api/comments/:id
 // @access   Private
-const deleteComment = async (req, res) => {
+const deleteComment = async (req, res, next) => {
   try {
     const { _id: userId } = req.user;
     const { id: commentId } = req.params;
@@ -253,6 +264,7 @@ const deleteComment = async (req, res) => {
     if (err) {
       const error = new CustomError(errMsg, 400, "delete-comment");
       next(error);
+      return;
     }
 
     const deletedComment = await Comment.findByIdAndDelete(commentId);
@@ -265,6 +277,7 @@ const deleteComment = async (req, res) => {
         "delete-comment"
       );
       next(error);
+      return;
     }
 
     return res.status(200).json({
@@ -282,6 +295,7 @@ const deleteComment = async (req, res) => {
       "delete-comment"
     );
     next(error);
+    return;
   }
 };
 

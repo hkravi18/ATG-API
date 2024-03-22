@@ -64,6 +64,7 @@ const forgetPassword = async (req, res, next) => {
         "forget-password"
       );
       next(error);
+      return;
     }
   } catch (err) {
     console.error(`ERROR (forget-password): ${err.message}`);
@@ -73,13 +74,14 @@ const forgetPassword = async (req, res, next) => {
       "forget-password"
     );
     next(error);
+    return;
   }
 };
 
 // @desc     Reset Password
 // route     POST /api/password/reset
 // @access   Private
-const resetPassword = async (req, res) => {
+const resetPassword = async (req, res, next) => {
   try {
     const { token, newPassword } = req.body;
 
@@ -97,6 +99,7 @@ const resetPassword = async (req, res) => {
         "reset-password"
       );
       next(error);
+      return;
     }
 
     //hasing the new password
@@ -121,6 +124,7 @@ const resetPassword = async (req, res) => {
       "reset-password"
     );
     next(error);
+    return;
   }
 };
 
