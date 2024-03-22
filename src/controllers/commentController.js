@@ -3,7 +3,7 @@
 const Comment = require("../models/commentModel.js");
 
 //decryption util function
-const decryptContent = require("../utils/decryptData.js");
+const decryptContent = require("../utils/decryptContent.js");
 
 // @desc     Get All Comments For A Post
 // route     GET /api/comments
@@ -145,7 +145,7 @@ const createComment = async (req, res) => {
       postId,
     });
 
-    // console.log("created comment : ", createdComment);
+    console.log("created comment : ", createdComment);
 
     return res.status(200).json({
       ok: true,
@@ -198,7 +198,7 @@ const updateComment = async (req, res) => {
 
     //updating the post
     comment.content = content;
-    comment.save();
+    await comment.save();
 
     // console.log("updated comment : ", comment);
 

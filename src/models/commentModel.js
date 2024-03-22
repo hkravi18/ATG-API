@@ -22,7 +22,7 @@ const commentSchema = new Schema({
 });
 
 //encrypting the content before saving
-commentSchema.pre("save", (next) => {
+commentSchema.pre("save", function (next) {
   if (this.content) {
     this.content = encrypt(this.content);
     // this.content = JSON.stringify(encryptedContent);
@@ -31,7 +31,7 @@ commentSchema.pre("save", (next) => {
 });
 
 //mongoose method for decrypting the content
-commentSchema.methods.decryptContent = () => {
+commentSchema.methods.decryptContent = function () {
   if (this.content) {
     return decrypt(this.content);
   }

@@ -3,7 +3,7 @@ const Post = require("../models/postModel.js");
 const Comment = require("../models/commentModel.js");
 
 //decryption util function
-const decryptContent = require("../utils/decryptData.js");
+const decryptContent = require("../utils/decryptContent.js");
 
 // @desc     Get All Posts
 // route     GET /api/posts
@@ -148,7 +148,7 @@ const createPost = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error(`ERROR (create-post): ${err}`);
+    console.error(`ERROR (create-post): ${err.message}`);
 
     return res.status(500).json({
       ok: false,
@@ -191,7 +191,7 @@ const updatePost = async (req, res) => {
 
     //updating the post
     post.content = newContent;
-    post.save();
+    await post.save();
 
     console.log("updated post : ", post);
 

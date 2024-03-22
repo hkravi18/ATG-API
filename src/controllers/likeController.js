@@ -1,9 +1,8 @@
 //models
 const Post = require("../models/postModel.js");
-const Comment = require("../models/commentModel.js");
 
 //decryption util function
-const decryptContent = require("../utils/decryptData.js");
+const decryptContent = require("../utils/decryptContent.js");
 
 // @desc     Like Post
 // route     POST /api/post/like
@@ -34,7 +33,7 @@ const likePost = async (req, res) => {
     }
 
     post.likes.push(userId);
-    post.save();
+    await post.save();
 
     return res.status(200).json({
       ok: true,
@@ -62,6 +61,8 @@ const getAllLikePosts = async (req, res) => {
     const likedPosts = await Post.find({
       likes: userId,
     });
+
+    console.log("decrypt : ", decryptContent(likedPosts));
 
     return res.status(200).json({
       ok: true,
